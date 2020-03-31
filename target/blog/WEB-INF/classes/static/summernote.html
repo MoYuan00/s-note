@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>富文本编辑</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet" >
+    <!--    <link href="css/summernote-bs4.min.css" rel="stylesheet">-->
+
+</head>
+<body>
+<div id="app" class="container-fluid">
+        <aside class=" float-left">
+            <ul>
+                <li>笔记</li>
+            </ul>
+        </aside>
+        <div id="edit-panel" class="float-left">
+            <header>
+                <input>编辑</input>
+            </header>
+            <textarea id="summernote" ></textarea>
+        </div>
+</div>
+
+</body>
+<script src="js/vue.js"></script>
+<script src="js/marked.min.js"></script>
+
+<!--富文本编辑器 ------------------------------------------ -->
+<script src="js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+<script src="js/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<!--<script src="js/summernote-bs4.min.js"></script>-->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-bs4.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.16/dist/summernote-bs4.min.js"></script>
+<script>
+
+    var app = new Vue({
+        el: "#app",
+        data: {
+            editing: markupStr,
+            selectedIndex: -1,
+            noteList:[],
+        },
+        computed:{
+        },
+        watch:{
+            editing: {
+                handler(val, oldval){
+                    console.log(val);
+                    console.log(oldval);
+                },
+            }
+        }
+    });
+    var markupStr = null;
+    $(document).ready(function() {
+        markupStr = $('#summernote').summernote({
+            placeholder: '开始',
+            tabsize: 2,
+            height: 400,
+            callbacks: {
+                onChange: function(contents, $editable) {
+                    console.log('onChange:', contents, $editable);
+                }
+            }
+        });
+    });
+</script>
+<style>
+    .display-block {
+        display: block;
+    }
+</style>
+</html>

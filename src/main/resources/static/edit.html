@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>笔记</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!--    <link href="css/summernote-bs4.min.css" rel="stylesheet">-->
+</head>
+<body>
+<div id="app" class="container-fluid">
+    <div class="m-1">
+        <!--        笔记列表-->
+        <aside class="float-left m-2">
+
+            <ul class="list-unstyled">
+                <li>
+                    <button class="btn  btn-primary" @click="saveRemote">同步</button>
+                </li>
+                <li>
+
+                    <button class="btn btn-light" @click="getRemote">获取云笔记</button>
+                </li>
+                <li>
+                    <button class="btn  btn-primary" @click="newNote" :title="newBtnTitle">New note</button>
+                </li>
+                <template v-for="note in noteList">
+                    <li
+                            class="my-1 p-1 border-bottom"
+                            @click="selectNote(note)"
+                            :class="{'selected-note': note.id == selectedId, favorite: note.favorite}">
+                        <span v-if="note.favorite">!</span>
+                        {{note.title}}
+                    </li>
+                </template>
+            </ul>
+        </aside>
+        <!--        显示笔记-->
+        <div class="row vh-100" v-if="selectedNote">
+            <div id="edit-panel" class="col-6">
+                <header class="form-inline">
+                    <input type="text"
+                           @change="saveChangeLocal()"
+                           class="form-control"
+                           v-model="selectedNote.title">
+                    <button class="form-control" @click="favorite(selectedNote)">
+                        <span v-if="!selectedNote.favorite">
+                        收藏
+                        </span>
+                        <span v-else>
+                        取消收藏
+                        </span>
+                    </button>
+                    <button class="form-control" @click="deleteNoteLocal(selectedNote)">删除</button>
+                </header>
+                <textarea class="form-control"
+                          style="width: 100%; height: 80%"
+                          @change="saveChangeLocal()"
+                          id="edit-textarea" v-model="selectedNote.content"></textarea>
+            </div>
+            <!--            预览笔记-->
+            <div id="preview-panel" class="col-6">
+                <header>
+                    <h3>{{selectedNote.title}}</h3>
+                </header>
+                <div v-html="translate">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script src="js/vue.js"></script>
+<script src="js/marked.min.js"></script>
+<script src="js/axios.min.js"></script>
+
+<script src="js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+<script src="js/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+<!--<script src="js/summernote-bs4.min.js"></script>-->
+
+
+<script src="otherJs/textarea-auto.js"></script>
+
+<!--本页面的js文件-->
+<script src="js/project/del/index.methods.js"></script>
+<script src="js/project/del/index.computed.js"></script>
+<script>
+    const itemStr = "content";
+    const selectedIdStr = "selectedId";
+    const operateTypes = {insert: 1, delete: -2, update: -1};
+    var app = new Vue({
+        el: "#app",
+        data: {
+            itemStr: "content",
+            selectedId: null,
+            noteList: JSON.parse(localStorage.getItem(itemStr)) || [],
+
+            // 记录 没有同步到云的 删除,添加，更新的 笔记id
+            // {operateType:1, id:12312334} 构成
+            operations:[]
+        },
+        created() {
+            // this.getLoginUserId();
+        },
+        methods: methods,
+        computed: computed,
+        watch: {}
+    });
+</script>
+<style>
+    .display-block {
+        display: block;
+    }
+
+    .selected-note {
+        background-color: #0b2e13;
+        color: white;
+    }
+</style>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登陆界面</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootoast.css" rel="stylesheet">
+</head>
+<body>
+<div id="app" class="my-5">
+    <div class="container-fluid">
+        <div>
+            <div>
+                <h2 class=" text-center">登陆</h2>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-auto">
+                    <div class="form-group">
+                        <label for="nickname-input">用户名</label>
+                        <input class="form-control" type="text" id="nickname-input"
+                               v-model="user.nickname">
+                    </div>
+                    <div class="form-group">
+                        <label for="password-input">密码</label>
+                        <input class="form-control" type="password" id="password-input"
+                               v-model="user.password">
+                    </div>
+                    <div class="row px-2">
+                        <button @click="login()" class="form-control btn btn-dark col-7 mx-1">登陆</button>
+                        <a href="register.html" class="form-control btn btn-secondary col mx-1">注册</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+<script src="js/vue.js"></script>
+<script src="js/marked.min.js"></script>
+<script src="js/axios.min.js"></script>
+
+<script src="js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+<script src="js/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+
+
+<script src="js/bootoast.js"></script>
+<script src="js/project/bootoast.util.js"></script>
+<script src="js/project/remoteJs.js"></script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            user: {
+                nickname: null,
+                password: null
+            }
+        },
+        methods: {
+            login() {
+                var me = this;
+                remoteJs.login(me.user).then(msg => {
+                    console.log("then ");
+                    console.log(msg);
+                    if (msg.data.state) {
+                        bootoastUtil.toast("登录成功了！ QAQ 新世界 正在 向你跑来 PPPPPP BuBuBu ~~~~ QMQ", 'success')
+                        setTimeout(function () {
+                            location.href = 'index.html';
+                        }, 2000);
+                    } else {
+                        bootoastUtil.toast("登录失败！", 'warn')
+                    }
+                }).catch(msg => {
+                    console.log("catch ");
+                    console.log(msg)
+                    bootoastUtil.toast("登录错误！", 'error')
+                });
+            }
+        }
+    });
+</script>
+</html>

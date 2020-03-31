@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>笔记管理</title>
+
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/bootoast.css" rel="stylesheet">
+    <!--    <link href="css/summernote-bs4.min.css" rel="stylesheet">-->
+</head>
+<body class="mb-5">
+<div id="app" class="container-fluid">
+    <header>
+        <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+            <div class="form-inline">
+                <a href="index.html" class="btn btn-outline-primary mx-1">主页</a>
+                <a href="newNote.html" class="btn btn-outline-primary mx-1">新建笔记</a>
+            </div>
+            <template v-if="wastedOpen">
+                <button v-if="isWasted" @click="toWastedOrNote" class="btn btn-success">
+                    去~笔记
+                </button>
+                <button @click="toWastedOrNote" v-else class="btn btn-danger">
+                    去~垃圾箱
+                </button>
+            </template>
+        </nav>
+    </header>
+    <div class="row justify-content-between my-1">
+        <div class="col-3">
+            <aside class=" container-fluid card">
+                <header>
+                    <h3>分类
+                        <span class="badge badge-light badge-pill">
+                                 {{clazzList.length}}</span>
+                    </h3>
+                </header>
+                <ul class="list-unstyled ">
+                    <span @click="changeSelectClazz(-1)">
+                        <li :class="{'clazz-list-item-selected': clazzSelectedIndex < 0}"
+                            class="dropdown-item">
+                             <span class="badge badge-light badge-pill">
+                                 {{noteList.length}}</span>
+                            全部
+                        </li>
+                    </span>
+                    <span v-for="clazz,index in clazzList"
+                          @click="changeSelectClazz(index)">
+                        <li :class="{'clazz-list-item-selected': clazzSelectedIndex === index}"
+                            class="dropdown-item text-truncate"
+                            data-toggle="tooltip" data-placement="right" :title="'描述:' + clazz.detail">
+                             <span class="badge badge-light badge-pill">
+                                 {{noteList.filter(note=>{return note.clazzId === clazz.id}).length}}</span>
+                            {{clazz.title}}
+<!--                            垃圾箱不允许删除 修改 分类-->
+                            <template v-if="!isWasted">
+                                <button @click="deleteClazz(clazz.id)" class="btn btn-danger badge badge-pill float-right">
+                                    删除
+                                </button>
+                                <button class="btn btn-primary badge badge-pill float-right" data-toggle="modal"
+                                        data-target="#clazzUpdateModal">编辑</button>
+                            </template>
+                        </li>
+                    </span>
+                </ul>
+            </aside>
+        </div>
+        <div class="col ">
+            <section class="container-fluid">
+                <div class="">
+                    <div class="card  my-1 px-1"
+                         :class="{'minimum-note': !isNoteMax(note.id), 'maximum-note':isNoteMax(note.id)}"
+                         v-for="note in selectClazzNoteList">
+                        <header>
+                            <button
+                                    @click="changeNoteMinMax(note.id)"
+                                    class="btn btn-link text-dark float-left">
+                                <h3>{{note.title}}</h3>
+                            </button>
+                            <div class="float-right">
+                                <template>
+                                    <button v-if="isWasted" @click="recoveryNote(note.id)"
+                                            class="btn btn-success badge badge-pill">
+                                        恢复它！
+                                    </button>
+                                    <button v-else @click="editNote(note.id)"
+                                            class="btn badge-primary badge badge-pill">
+                                        编辑
+                                    </button>
+                                </template>
+                                <button @click="deleteNote(note.id)"
+                                        class="btn badge-danger badge badge-pill">
+                                    {{isWasted ? '彻底删除' : '废弃它~'}}
+                                </button>
+                            </div>
+                        </header>
+                        <section
+
+                                class="text-monospace text-truncate d-block "
+                                v-html="translateMarkdown(note)"></section>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+    <!-- clazz 更新 弹出 框 -->
+    <div v-if="selectedClazz" class="modal fade" id="clazzUpdateModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">修改分类</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="card card-body">
+                        <div class="form-group">
+                            <label for="new-clazz-title">名称</label>
+                            <input type="text" id="new-clazz-title" class="form-control"
+                                   v-model="selectedClazz.title">
+                        </div>
+                        <div class="form-group">
+                            <label for="new-clazz-detail">描述</label>
+                            <textarea type="text" id="new-clazz-detail"
+                                      class="form-control" v-model="selectedClazz.detail"></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                    <button @click="updateClazz(selectedClazz)" type="button" class="btn btn-primary">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<script src="js/vue.js"></script>
+<script src="js/marked.min.js"></script>
+<script src="js/axios.min.js"></script>
+
+<script src="js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+<script src="js/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/bootoast.js"></script>
+
+<!--<script src="js/summernote-bs4.min.js"></script>-->
+
+
+<script src="otherJs/textarea-auto.js"></script>
+
+<!--本页面的js文件-->
+<script src="js/project/del/index.methods.js"></script>
+<script src="js/project/del/index.computed.js"></script>
+
+<script src="js/project/remoteJs.js"></script>
+<script src="js/project/localJs.js"></script>
+<script src="js/project/bootoast.util.js"></script>
+<script>
+    var app = new Vue({
+        el: "#app",
+        data: {
+            // 是否启用垃圾箱
+            wastedOpen: true,
+            // 查看废弃 ： true，查看 没废弃 :true
+            isWasted: false,
+            clazzList: [],
+            noteList: [],
+            // 将笔记最大最小化
+            noteMinMax: [],
+            // 当前选中的 笔记类型下标
+            clazzSelectedIndex: -1,
+            selectedNote: null,
+        },
+        created() {
+            this.getRemoteClazz();
+            this.getRemoteAllNote();
+
+        },
+        mounted() {
+        },
+        methods: {
+            getRemoteClazz() {
+                const me = this;
+                remoteJs.getRemoteClazz().then(msg => {
+                    console.log("成功:");
+                    console.log(msg.data);
+                    if (msg.data.data) {
+                        me.clazzList = msg.data.data || [];
+                        bootoastUtil.toast("获取clazz成功 QAQ ！！！", "success")
+                    } else {
+                        bootoastUtil.toast("获取clazz失败 QVQ !!！你是不是蠢到没有登录？？ ！！", "warn")
+                    }
+                }).catch(msg => {
+                    console.log("失败:");
+                    bootoastUtil.toast("获取clazz错误 QVQ !!！完蛋了 wuwuuw QUQ QUQ！！", "error")
+                });
+
+            },
+            getRemoteAllNote() {
+                const me = this;
+                var func = remoteJs.getRemoteAllNote;
+                if(me.isWasted){
+                    func = remoteJs.getRemoteAllWastedNote;
+                }
+                func().then(msg => {
+                    console.log("成功:");
+                    console.log(msg.data);
+                    if (msg.data.data) {
+                        me.noteList = msg.data.data || [];
+                        bootoastUtil.toast("获取note成功 QAQ ！！！", "success")
+                    } else {
+                        bootoastUtil.toast("获取note失败了 QVQ ！！！你是不是蠢到没有登录？？ ！！", "warn")
+                    }
+                }).catch(msg => {
+                    console.log("失败:");
+                    bootoastUtil.toast("获取note错误了 QWQ ！！！", "error")
+                });
+            },
+            changeSelectClazz(index) {
+                this.clazzSelectedIndex = index;
+                console.log("改变选中的类型: " + this.clazzSelectedIndex)
+            },
+            selectNote(note) {
+                this.selectedNote = note;
+            },
+            translateMarkdown(note) {
+                return note && note.content ?
+                    marked(note.content) : '';
+            },
+            deleteNote(id) {
+                remoteJs.deleteNote(id)
+                    .then(msg => {
+                        console.log("成功")
+                        console.log(msg)
+                        if (msg.data.state) {
+                            // 显示弹窗
+                            bootoastUtil.toast("QAQ 删除成功！", 'success');
+                            // 删除成功后 重新获取一下 note
+                            this.getRemoteAllNote();
+                        } else {
+                            bootoastUtil.toast("删除失败！", 'warn');
+                        }
+                    }).catch(msg => {
+                    console.log("失败")
+                    console.log(msg);
+                    bootoastUtil.toast(" ~~~ 删除错误！", 'error');
+                });
+            },
+            // 编辑 一个笔记， 将要编辑的笔记id存入 local，然后给编辑页面去取
+            editNote(id) {
+                localJs.editNote.set(id);
+                location.href = "newNote.html"
+            },
+            changeNoteMinMax(id) {
+                var map = this.noteMinMax.find(m => m.key == id);
+                console.log(map)
+                if (map && map.value == 'max') {// 如果最大化了
+                    map.value = 'min';
+                    return;
+                }
+                if (map && map.value == 'min') {
+                    map.value = 'max';
+                    return;
+                }
+                console.log(map)
+            },
+            // 是否是 最大化：true，最小化：false
+            isNoteMax(noteId) {
+                var map = this.noteMinMax.find(m => m.key == noteId);
+                if (!map) {
+                    this.noteMinMax.push({key: noteId, value: 'min'});
+                    return false;
+                }
+                if (map.value == 'max') {// 如果最大化了
+                    return true;
+                }
+                if (map.value == 'min') {
+                    return false;
+                }
+                return false;
+            },
+            deleteClazz(clazzId) {
+                remoteJs.deleteClazz(clazzId)
+                    .then(msg => {
+                        console.log("成功")
+                        console.log(msg)
+                        if (msg.data.state) {
+                            // 显示弹窗
+                            bootoastUtil.toast("QAQ 删除成功！", 'success');
+                            // 删除 之后 重新获取分类 和 笔记
+                            this.getRemoteClazz();
+                            this.getRemoteAllNote();
+                        } else {
+                            bootoastUtil.toast("WUWUWU 删除失败！", 'warn');
+                        }
+                    }).catch(msg => {
+                    console.log("失败")
+                    console.log(msg);
+                    bootoastUtil.toast("删除错误！", 'error');
+                });
+            },
+            updateClazz(clazz) {
+                var me = this;
+                remoteJs.updateClazz(clazz)
+                    .then(msg => {
+                        console.log("成功")
+                        console.log(msg)
+                        if (msg.data.state) {
+                            // 重新获取 一下 clazz
+                            me.getRemoteClazz();
+                            // 显示弹窗
+                            bootoastUtil.toast(" QAQ 更新成功！", 'success');
+                            // 隐藏
+                            $('#clazzUpdateModal').modal('hide');
+                        } else {
+                            bootoastUtil.toast("更新失败！", 'warn');
+                        }
+                    }).catch(msg => {
+                    console.log("失败")
+                    console.log(msg);
+                    bootoastUtil.toast("更新错误！", 'error');
+                });
+            },
+            toWastedOrNote(){
+                // 切换到垃圾箱
+                this.isWasted = !this.isWasted;
+                // 重新 获 取 笔记
+                this.getRemoteAllNote();
+            },
+            // 恢复 垃圾箱内的笔记
+            recoveryNote(id){
+                var me = this;
+                remoteJs.recoveryNote(id).then(msg => {
+                    console.log("成功")
+                    console.log(msg)
+                    if (msg.data.state) {
+                        // 重新获取 一下 clazz
+                        me.getRemoteAllNote();
+                        // 显示弹窗
+                        bootoastUtil.toast(" QAQ 恢复成功！", 'success');
+                    } else {
+                        bootoastUtil.toast("为啥 会~ 恢复成功！", 'warn');
+                    }
+                }).catch(msg => {
+                    console.log("失败")
+                    console.log(msg);
+                    bootoastUtil.toast("恢复错误！", 'error');
+                });
+            }
+        },
+        computed: {
+            selectClazzNoteList() {
+                if (this.clazzSelectedIndex < 0)
+                    return this.noteList;
+                var selectedClazz = this.clazzList[this.clazzSelectedIndex];
+                console.log("切换为: ")
+                console.log(selectedClazz)
+                return this.noteList.filter(note => note.clazzId === selectedClazz.id) || [];
+            },
+            selectedClazz() {
+                if (this.clazzSelectedIndex >= 0)
+                    return this.clazzList[this.clazzSelectedIndex];
+                return null;
+            }
+
+        }
+    });
+
+
+</script>
+<style>
+    .clazz-list-item-selected {
+        box-shadow: 0px 0px 2px #4e4e4e;
+    }
+
+    .note-list-item-selected {
+        box-shadow: 0px 0px 2px #4e4e4e;
+    }
+
+    /*缩小笔记*/
+    .minimum-note h2,
+    .minimum-note h1,
+    .minimum-note h3,
+    .minimum-note h4,
+    .minimum-note h5,
+    .minimum-note h6,
+    .minimum-note p,
+    .minimum-note strong {
+        font-size: small;
+
+    }
+
+    .minimum-note section {
+        color: #6c757d !important;
+    }
+
+    .minimum-note {
+        max-height: 150px;
+        overflow: hidden;
+    }
+
+    .minimum-note header h3 {
+        font-size: 1.65rem;
+    }
+
+    /*最大化笔记*/
+    .maximum-note {
+        max-height: none;
+        overflow: auto;
+    }
+
+</style>
+<script src="js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+</html>
