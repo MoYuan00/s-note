@@ -17,7 +17,7 @@
             <!--            编辑面板-->
             <div id="edit-panel" style="overflow-y: auto" class="col-6 vh-100">
                 <header class="row m-1">
-                    <a href="index.html" class="btn btn-link ">主页</a>
+                    <a href="userHome.html" class="btn btn-link ">主页</a>
                     <input type="text"
                            class="form-control text-monospace col-8 mx-2    "
                            v-model="note.title">
@@ -198,7 +198,7 @@
                     console.log("成功");
                     console.log(msg);
                     if (msg.data.state) {
-                        location.href = 'index.html';
+                        location.href = 'userHome.html';
                     }
                 }).catch(msg => {
                     console.log("失败");

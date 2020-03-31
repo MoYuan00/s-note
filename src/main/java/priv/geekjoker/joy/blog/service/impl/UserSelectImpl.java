@@ -18,6 +18,11 @@ public class UserSelectImpl implements UserSelect {
     @Override
     public List<User> listUser() {
         List<User> userList = userSelectMapper.listUser();
+        if(userList != null)
+            for(User user : userList){// 清理查询出来的密码 和 id 保密安全
+                user.setPassword(null);
+                user.setId(null);
+            }
         log.debug("listUser() 所有的user个数: " + userList.size());
         return userList;
     }

@@ -5,5 +5,13 @@ let indexRemoteJs = {
     getAllUserNotes(){
         // axios.post(url[, data[, config]])
         return axiosInstance.get('note/getAllUserNotes');
+    },
+    getAllUsers(){
+        // axios.post(url[, data[, config]])
+        return axiosInstance.get('user/select');
+    },
+    getLoginUser(){
+        // axios.post(url[, data[, config]])
+        return axiosInstance.get('user/getLoginUser');
     }
 };
