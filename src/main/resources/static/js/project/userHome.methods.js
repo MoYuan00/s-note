@@ -72,7 +72,7 @@ const indexMethods = {
         });
     },
     updatePW(){
-        remoteJs.updatePassword(this.updatePassword).then(msg=>{
+        remoteJs.updatePassword(this.inputPassword).then(msg=>{
             console.log("成功");
             console.log(msg);
             if (msg.data.state) {
@@ -80,11 +80,12 @@ const indexMethods = {
             }else{
                 bootoastUtil.toast("密码修改失败 # # # ！", 'warn')
             }
-            $('#updatePasswordModal1').modal('hide')// 关闭窗口
+            $('#updatePwModal').modal('hide')// 关闭窗口
         }).catch(msg=>{
             console.log("失败");
             console.log(msg);
             bootoastUtil.toast("密码修改 错误 啦，请重试一下 ！！！！", 'error')
         });
+        this.inputPassword = '';
     }
 };
