@@ -11,10 +11,13 @@
     <link href="css/bootoast.css" rel="stylesheet">
 </head>
 
-<body >
+<body>
     <div id="app" class="container">
         <header class="py-3 pt-4" style="background-color: rgb(216, 216, 216);">
             <h1 class="text-center py-1">简记(s-note)</h1>
+            <div class="text-left pl-2">
+                <a href="root/index.html" class="text-decoration-none">后台管理</a>
+            </div>
             <div v-show="thisUser" class="text-right px-4">
                 <a href="userHome.html" class="text-decoration-none">进入</a>
             </div>
@@ -23,17 +26,22 @@
             </div>
         </header>
         <!-- 显示笔记的一个列表 -->
-        <div class="row justify-content-between mt-3">
-            <div class="col-8">
+        <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2
+         mt-3">
+            <div class="col">
+                <header>
+                    <strong> 笔记列表：</strong>
+                </header>
                 <ul class="list-unstyled">
                     <li v-for="note in noteList" class="px-2">
                         <div style="min-height: 50px;">
                             <header>
-                                <h5 class='text-justify text-truncate text-monospace' style="max-width: 300px;min-height: 30px;">
+                                <h5 class='text-justify text-truncate text-monospace'
+                                    style="max-width: 300px;min-height: 30px;">
                                     {{note.title}}</h5>
                             </header>
                             <div class="text-justify text-monospace font-weight-light">
-                                    {{note.profile}}
+                                {{note.profile}}
                             </div>
                             <div class="text-right">
                                 <small>
@@ -45,17 +53,19 @@
                     </li>
                 </ul>
             </div>
-            <div class="col-3">
+            <!-- 显示用户列表 -->
+            <div class="col-md-3 ml-auto">
                 <header>
-                    列表：
+                    <strong>账号列表：</strong>
                 </header>
                 <ul class="list-unstyled">
                     <li v-for="user in userList" class="shadow-sm my-1 p-1 px-3">
                         <div>
-                            <div >
+                            <div>
                                 {{user.nickname}}
                             </div>
-                            <small class="font-weight-lighter">{{new Date(Date.parse(user.createTime)).toLocaleString()}}</small>
+                            <small
+                                class="font-weight-lighter">{{new Date(Date.parse(user.createTime)).toLocaleString()}}</small>
                         </div>
                     </li>
                 </ul>
@@ -92,15 +102,15 @@
         data: {
             noteList: [],
             userList: [],
-            thisUser:null
+            thisUser: null
         },
         created() {
             const me = this;
             // 获取 所有 的笔记
             indexRemoteJs.getAllUserNotes().then(msg => {
                 me.noteList = msg.data.data;
-                me.noteList.sort((a,b)=>{// 按照时间 进行 排序
-                    return -(Date.parse(a.createTime) - Date.parse(b.createTime)); 
+                me.noteList.sort((a, b) => {// 按照时间 进行 排序
+                    return -(Date.parse(a.createTime) - Date.parse(b.createTime));
                 });
             }).catch(msg => {
 
@@ -111,9 +121,9 @@
             }).catch(msg => {
             });
             // 获取 当前 用户是否登录
-            indexRemoteJs.getLoginUser().then(msg=>{
+            indexRemoteJs.getLoginUser().then(msg => {
                 me.thisUser = msg.data.data;
-            }).catch(msg=>{});
+            }).catch(msg => { });
         },
         mounted() {
 
