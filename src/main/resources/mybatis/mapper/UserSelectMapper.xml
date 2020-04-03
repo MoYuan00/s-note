@@ -9,6 +9,7 @@
         <result column="update_time" property="updateTime"/>
         <result column="nickname" property="nickname"/>
         <result column="password" property="password"/>
+        <result column="role" property="role"/>
     </resultMap>
     <select id="listUser" resultMap="userMap">
         select * from user

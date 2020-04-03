@@ -43,6 +43,27 @@ public class UserLoginControl {
         return new ModelMap("state", false);
     }
 
+     /**
+     * 登录管理员账户，并储存 userId
+     * @param userLogin 
+     * @param session 
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("/loginByRoot")
+    ModelMap loginByRoot(@RequestBody UserLogin user, HttpSession session){
+        log.debug("/loginByRoot 登陆请求: " + user);
+        User resultUser = userSelect.loginByRoot(
+            user.getNickname(), 
+            user.getPassword());
+        if(resultUser != null){// 如果登陆成功
+            // 加入 session
+            LoginUserUtils.saveLoginUserId(session, resultUser.getId());
+            return new ModelMap("state", true);
+        }
+        return new ModelMap("state", false);
+    }
+
     /**
      * 获取当前登陆 用户 的 id
      * 如果session 中 有用户id 表明登陆了，如果没有表示没有登陆

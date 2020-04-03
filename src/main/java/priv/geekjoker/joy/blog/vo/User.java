@@ -15,5 +15,6 @@ public class User {
     private Date updateTime;
     private String nickname;
     private String password;
+    private Boolean role;
 
 }

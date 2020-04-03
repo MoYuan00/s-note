@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>简记(s-note)后台管理系统</title>
+
+    <link href="../css/bootstrap.min.css" rel="stylesheet">
+    <link href="../css/bootoast.css" rel="stylesheet">
+</head>
+
+<body>
+    <div id="app" class="container">
+        <header class="py-3 pt-4" style="background-color: rgb(216, 216, 216);">
+            <h1 class="text-center py-1">简记(s-note)后台管理系统</h1>
+        </header>
+        <section class="mt-5">
+            <header>
+                <h1 class="text-center">
+                    后台管理系统登陆
+                </h1>
+            </header>
+            <div>
+                <div class="form-group">
+                    <label for="nickname">账号</label>
+                    <input type="text"
+                    v-model="user.nickname"
+                    class="form-control" name="" id="nickname" aria-describedby="helpId" 
+                    placeholder="管理账户">
+                </div>
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password"
+                    v-model="user.password"
+                    class="form-control" name="" id="password" aria-describedby="helpId"
+                        placeholder="密码">
+                </div>
+                <button
+                @click="checkLogin"
+                class="btn btn-dark form-control">登陆</button>
+            </div>
+        </section>
+    </div>
+</body>
+<!-- vue js -->
+<script src="../js/vue.js"></script>
+<!-- marked -->
+<script src="../js/marked.min.js"></script>
+<!-- axios -->
+<script src="../js/axios.min.js"></script>
+<!-- jquery -->
+<script src="../js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+<!-- bootstrap4 js -->
+<script src="../js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+    crossorigin="anonymous"></script>
+<!-- bootstrap4 popper -->
+<script src="../js/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+    crossorigin="anonymous"></script>
+<!-- bootoast bootstrap的消息框js支持 -->
+<script src="../js/bootoast.js"></script>
+
+
+<script src="../otherJs/textarea-auto.js"></script>
+<!-- 访问服务器的代码 -->
+<script src="../js/project/http.axios.js"></script>
+<script src="../js/project/remote/root.index.remoteJs.js"></script>
+<script src="../js/project/bootoast.util.js"></script>
+<script>
+    var app = new Vue({
+        el: "#app",
+        data:{
+            user:{
+                nickname: null,
+                password: null
+            }
+        },
+        methods: {
+            checkLogin(){
+                const me = this;
+                rootIndexRemoteJs.login(me.user).then(msg=>{
+                    if(msg.data.state){
+                        bootoastUtil.toast('登陆成功','success');
+                        setInterval(f=>{
+                            
+                        },1000);
+                    }else{
+                        bootoastUtil.toast('登陆失败','warn');
+                    }
+                }).catch(msg=>{})
+            }
+        },
+    });
+</script>
+
+</html>

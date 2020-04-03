@@ -27,6 +27,19 @@ public class UserSelectControl {
     }
 
     /**
+     * 管理员权限
+     * 查询出所有用户所有的信息
+     */
+    @RequestMapping("/selectUseRoot")
+    @ResponseBody
+    public ModelMap selectUseRoot(HttpSession session){
+        Long userId = LoginUserUtils.getLoginUserId(session);
+        ModelMap modelMap = new ModelMap();
+        modelMap.addAttribute("data", userSelect.listUserUseRoot(userId));
+        return modelMap;
+    }
+
+    /**
      * 获取当前登陆 用户 的 id
      * 如果session 中 有用户id 表明登陆了，如果没有表示没有登陆
      * @param session
@@ -40,5 +53,7 @@ public class UserSelectControl {
         User user =  userSelect.selectUserById(userId);
         return modelMap.addAttribute("data", user);
     }
+
+    
 
 }
