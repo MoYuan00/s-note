@@ -59,7 +59,6 @@ public class UserSelectImpl implements UserSelect {
         User user = userSelectMapper.selectUserByNickname(nickname);
         if (user != null && user.getPassword().equals(password) && user.getRole() != null && user.getRole()) {
             user.setPassword("********");// 隐藏密码
-            user.setId(null);
             user.setRole(null);
             return user;
         }
@@ -68,6 +67,7 @@ public class UserSelectImpl implements UserSelect {
 
     @Override
     public List<User> listUserUseRoot(Long userId) {
+        log.debug("listUserUseRoot() userId: " + userId);
         if(userId == null) return null;
         if(!userSelect.checkUserIdRootById(userId)){// 检查是否是管理员
             log.debug("listUserUseRoot() 当前登陆不是管理员，获取用户失败！");

@@ -58,6 +58,7 @@ public class UserLoginControl {
             user.getPassword());
         if(resultUser != null){// 如果登陆成功
             // 加入 session
+            log.debug("loginByRoot() 登录Id:" + resultUser.getId());
             LoginUserUtils.saveLoginUserId(session, resultUser.getId());
             return new ModelMap("state", true);
         }

@@ -4,6 +4,16 @@ spring:
     password: 123456
     url: jdbc:mysql://39.105.111.19:3306/blog?useUnicode=true&characterEncoding=utf-8&useSSL=true&serverTimezone=UTC
     driver-class-name: com.mysql.cj.jdbc.Driver
+    dbcp2:
+    # 防止mysql 空闲断开连接
+      initial-size: 5
+      validation-query: SELECT 1
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      max-wait-millis: 60000
+      time-between-eviction-runs-millis: 30000
+      
 
 # 配置mybatis
 mybatis:
