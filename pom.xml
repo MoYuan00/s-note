@@ -20,9 +20,11 @@
     </properties>
 
     <dependencies>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <!-- 排除内置的tomcat 运行组件 -->
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -30,12 +32,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
+         <!-- 先排除了自带的tomcat 然后再加入，并且设置为编译的时候需要，就可以打包为war发布到tomcat上去了 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-tomcat</artifactId>
             <!--            此处的 provided代表了springboot自带的tomcat在编译的时候需要，而发布的时候忽略。-->
             <scope>provided</scope>
         </dependency>
+
 <!--添加servlet 依赖 -->
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -46,7 +50,7 @@
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
             <artifactId>mybatis-spring-boot-starter</artifactId>
-            <version>2.1.1</version>
+            <version>2.1.2</version>
         </dependency>
 
         <dependency>
@@ -55,14 +59,10 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
-        <!--        <dependency>-->
-        <!--            <groupId>mysql</groupId>-->
-        <!--            <artifactId>mysql-connector-java</artifactId>-->
-        <!--            <scope>runtime</scope>-->
-        <!--        </dependency>-->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+            <!-- 去掉版本号，用来支持8.0版本，添加版本号为5.x版本 -->
             <!--            <version>5.1.6</version>-->
         </dependency>
         <dependency>
