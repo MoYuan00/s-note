@@ -27,7 +27,7 @@
                     </button>
                     <!-- 当导航主要部分  -->
                     <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-                        <div class="w-100" >
+                        <div class="w-100">
                             <ul class="navbar-nav mr-auto">
                                 <li class="nav-item w-100 ">
                                     <a class="nav-link  " href="user.html">用户</a>
@@ -81,20 +81,20 @@
                 password: null
             }
         },
+        mounted() {
+            rootIndexRemoteJs.isRootUserLogined().then(msg => {
+                if (msg.data.state) {
+                    bootoastUtil.toast('验证权限是：管理员！', 'success');
+                } else {
+                    bootoastUtil.toast('验证权限失败', 'warn');
+                    setTimeout(() => {
+                        window.location.href = "login.html";// 切换到后台登录页面
+                    }, 500);
+                }
+            }).catch(msg => { });
+        },
         methods: {
-            checkLogin() {
-                const me = this;
-                rootIndexRemoteJs.login(me.user).then(msg => {
-                    if (msg.data.state) {
-                        bootoastUtil.toast('登陆成功', 'success');
-                        setInterval(f => {
 
-                        }, 1000);
-                    } else {
-                        bootoastUtil.toast('登陆失败', 'warn');
-                    }
-                }).catch(msg => { })
-            }
         },
     });
 </script>
