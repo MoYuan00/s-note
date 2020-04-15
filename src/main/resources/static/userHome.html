@@ -13,11 +13,10 @@
 
 <body class="mb-5">
     <div id="app" class="container">
-
         <header class="py-3 pt-4" style="background-color: rgb(216, 216, 216);">
             <h1 class="text-center py-1"><a class="text-reset text-decoration-none" href="index.html">简记(s-note)</a>
             </h1>
-            <nav class="navbar " style="">
+            <nav class="navbar ">
                 <div class="form-inline">
                     <a href="manageNote.html" class="btn btn-outline-secondary mx-1 ">管理笔记</a>
                     <button @click="clickNewNote" class="btn btn-outline-secondary mx-1">新建笔记</button>
@@ -36,16 +35,16 @@
                                 data-target="#updatePwModal">
                                 修改密码
                             </button>
-
                             <button @click="logout" class="dropdown-item">退出登录</button>
                         </div>
                     </div>
                 </div>
             </nav>
         </header>
-        <div class="row justify-content-between my-1">
-            <div class="col-3">
-                <aside class=" container-fluid card">
+        <div class="row row-cols-1 row-cols-md-2 justify-content-between my-1">
+            <!-- 左边的笔记，分类标题 导航 -->
+            <div class="col-md-3">
+                <aside class=" container-fluid card py-1">
                     <header>
                         <h3>
                             分类
@@ -53,41 +52,61 @@
                                 {{clazzList.length}}</span>
                         </h3>
                     </header>
-                    <ul class="list-unstyled ">
-                        <span @click="changeSelectClazz(-1)">
-                            <li :class="{'clazz-list-item-selected': clazzSelectedIndex < 0}" class="dropdown-item">
-                                <span class="badge badge-light badge-pill">{{noteList.length}}</span>
-                                全部
-                            </li>
-                        </span>
-                        <span v-for="clazz,index in clazzList" @click="changeSelectClazz(index)">
-                            <li :class="{'clazz-list-item-selected': clazzSelectedIndex === index}"
-                                class="dropdown-item text-truncate" data-toggle="tooltip" data-placement="right"
-                                :title="'描述:' + clazz.detail">
-                                <span class="badge badge-light badge-pill">
-                                    {{noteList.filter(note=>{return note.clazzId === clazz.id}).length}}</span>
-                                {{clazz.title}}
-                            </li>
-                        </span>
-                    </ul>
+                    <div class="accordion" id="accordionExample">
+                        <!-- 全部笔记 -->
+                        <div class="card">
+                            <div class="py-1 mx-0" id="heading">
+                                <a href="#" class="d-block text-left collapsed" data-toggle="collapse"
+                                    data-target="#collapse" aria-expanded="false" aria-controls="collapse">
+                                    <!-- 笔记列表的长度 -->
+                                    <span class="badge badge-light badge-pill">
+                                        {{noteList.length}}</span>
+                                    全部
+                                </a>
+                            </div>
+                            <div id="collapse" aria-labelledby="heading" data-parent="#accordionExample">
+                                <!-- 显示笔记的标题的列表 -->
+                                <ul class="list-unstyled ">
+                                    <span v-for="note in noteList" @click="selectNote(note)">
+                                        <li class="dropdown-item text-truncate"
+                                            :class="{'note-list-item-selected': note == selectedNote}">
+                                            {{note.title}}
+                                        </li>
+                                    </span>
+                                </ul>
+                            </div>
+                        </div><!-- 全部笔记 end -->
+                        <!-- 每个分类 的笔记 -->
+                        <div v-for="clazz,index in clazzList" class="card">
+                            <div class="py-1 mx-0" :id="'heading' + index" :title="'描述:' + clazz.detail">
+                                <a href="#" class="d-block text-left" data-toggle="collapse"
+                                    :data-target="'#collapse' + index" aria-expanded=" false"
+                                    :aria-controls="'collapse' + index">
+                                    <span class="badge badge-light badge-pill">
+                                        {{noteList.filter(note=>{return note.clazzId === clazz.id}).length}}</span>
+                                    {{clazz.title}}
+                                </a>
+                            </div>
+                            <div :id="'collapse' + index" class="collapse" :aria-labelledby="'heading' + index"
+                                data-parent="#accordionExample">
+                                <!-- 显示笔记的标题的列表 -->
+                                <ul class="list-unstyled ">
+                                    <span v-for="note in noteList" @click="selectNote(note)">
+                                        <template v-if="note.clazzId == clazz.id">
+                                            <li :class="{'note-list-item-selected': note == selectedNote}"
+                                                class="dropdown-item text-truncate">
+                                                {{note.title}}
+                                            </li>
+                                        </template>
+                                    </span>
+                                </ul>
+                            </div>
+                        </div><!-- 每个分类 的笔记 end -->
+                    </div>
                 </aside>
-                <aside class="container-fluid card my-1">
-                    <header>
-                        <h3>
-                            笔记列表
-                        </h3>
-                    </header>
-                    <ul class="list-unstyled ">
-                        <span v-for="note in selectClazzNoteList" @click="selectNote(note)">
-                            <li :class="{'note-list-item-selected': note == selectedNote}"
-                                class="dropdown-item text-truncate">
-                                {{note.title}}
-                            </li>
-                        </span>
-                    </ul>
-                </aside>
-            </div>
-            <div class="col ">
+            </div><!-- 左边的笔记，分类标题 导航 end -->
+            <!-- 笔记 内容列表 -->
+            <div class="col-auto col-md-9">
                 <section v-if="selectedNote" class=" container-fluid card">
                     <div class="text-monospace">
                         <header>
@@ -99,11 +118,12 @@
                                 更新时间: {{selectedNote.updateTime.slice(0, 10)}}
                             </small>
                         </p>
-                        <section v-html="translateMarkdown"></section>
+                        <!-- 显示 一条笔记 -->
+                        <section class="note-panel" v-html="translateMarkdown"></section>
                     </div>
                 </section>
             </div>
-        </div>
+        </div><!-- 笔记 内容列表 end -->
 
         <!-- 修改密码弹窗 Modal -->
         <div class="modal fade" id="updatePwModal" tabindex="-1" role="dialog" aria-labelledby="updatePwModalLabel"
@@ -118,10 +138,9 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                          <label for="inputPassword">密码</label>
-                          <input 
-                          v-model="inputPassword"
-                          type="password" class="form-control" name="" id="inputPassword" placeholder="新密码">
+                            <label for="inputPassword">密码</label>
+                            <input v-model="inputPassword" type="password" class="form-control" id="inputPassword"
+                                placeholder="新密码">
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -138,6 +157,7 @@
 <script src="js/axios.min.js"></script>
 
 <script src="js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
+<script src="js/bootstrap.min.js"></script>
 <script src="js/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
     crossorigin="anonymous"></script>
 
@@ -195,14 +215,6 @@
         },
         methods: indexMethods,
         computed: {
-            selectClazzNoteList() {
-                if (this.clazzSelectedIndex < 0)
-                    return this.noteList;
-                var selectedClazz = this.clazzList[this.clazzSelectedIndex];
-                console.log("切换为: ")
-                console.log(selectedClazz)
-                return this.noteList.filter(note => note.clazzId === selectedClazz.id);
-            },
             translateMarkdown() {
                 return this.selectedNote && this.selectedNote.content ?
                     marked(this.selectedNote.content) : '';
@@ -218,6 +230,12 @@
 
     .note-list-item-selected {
         box-shadow: 0px 0px 2px #4e4e4e;
+    }
+
+    /* 显示 笔记的面板 */
+    /* 防止过大的图片 溢出边界 */
+    .note-panel img {
+        max-width: 100%;
     }
 </style>
 <script src="js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"

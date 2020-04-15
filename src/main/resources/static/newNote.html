@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,99 +8,93 @@
     <title>新笔记</title>
 
     <link href="css/bootstrap.min.css" rel="stylesheet">
-        <link href="css/bootoast.css" rel="stylesheet">
+    <link href="css/bootoast.css" rel="stylesheet">
 </head>
-<body>
-<div id="app" class="container-fluid overflow-hidden vh-100">
-    <div class="my-1">
-        <!--        显示笔记-->
-        <div class="row" v-if="note">
-            <!--            编辑面板-->
-            <div id="edit-panel" style="overflow-y: auto" class="col-6 vh-100">
-                <header class="row m-1">
-                    <a href="userHome.html" class="btn btn-link ">主页</a>
-                    <input type="text"
-                           class="form-control text-monospace col-8 mx-2    "
-                           v-model="note.title">
-                    <button class="btn btn-primary float-right" data-toggle="modal" data-target="#staticBackdrop">
-                        保存
-                    </button>
-                </header>
 
-                <textarea class="form-control form-text w-100 pb-5 mb-5 text-monospace overflow-hidden min-vh-100"
-                          style="border: none; background-color: #fafafa"
-                          id="edit-textarea" v-model="note.content"
-                          onfocus="window.activeobj=this;this.clock=setInterval(function(){activeobj.style.height=activeobj.scrollHeight+'px';},200);"
-                          onblur="clearInterval(this.clock);"
-                ></textarea>
-            </div>
-            <!--            预览笔记-->
-            <div id="preview-panel" class="col-6 vh-100 text-monospace" style="overflow-y: auto">
-                <header>
-                    <h3>{{note.title || ""}}</h3>
-                </header>
-                <div v-html="translate">
+<body>
+    <div id="app" class="container-fluid ">
+        <div class="my-1">
+            <!--        显示笔记-->
+            <div class="row row-cols-1 row-cols-sm-1 row-cols-md-2" v-if="note">
+                <!--            编辑面板-->
+                <div id="edit-panel" style="overflow-y: auto" class="col col-md-6">
+                    <header class="row m-1">
+                        <a href="userHome.html" class="btn btn-link ">主页</a>
+                        <input type="text" class="form-control text-monospace col-8 mx-2    " v-model="note.title">
+                        <button class="btn btn-primary float-right" data-toggle="modal" data-target="#staticBackdrop">
+                            保存
+                        </button>
+                    </header>
+
+                    <textarea class="form-control form-text w-100 pb-5 mb-5 text-monospace overflow-hidden min-vh-100"
+                        style="border: none; background-color: #fafafa" id="edit-textarea" v-model="note.content"
+                        onfocus="window.activeobj=this;this.clock=setInterval(function(){activeobj.style.height=activeobj.scrollHeight+'px';},200);"
+                        onblur="clearInterval(this.clock);"></textarea>
+                </div>
+                <!--            预览笔记-->
+                <div id="preview-panel" class="col col-md-6 text-monospace note-panel" style="overflow-y: auto">
+                    <header>
+                        <h3>{{note.title || ""}}</h3>
+                    </header>
+                    <div v-html="translate">
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <!-- Modal -->
-    <div class="modal fade" id="staticBackdrop"
-         data-backdrop="static" tabindex="-1"
-         role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">保存笔记</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div>
-                        <div class="form-group">
-                            <label for="clazz-select">分类：</label>
-                            <select id="clazz-select" class="custom-select" v-model="note.clazzId">
-                                <option :value="null" selected>默认分类</option>
-                                <option v-for="clazz,index in clazzList"
-                                        :value="clazz.id">{{clazz.title}}
-                                </option>
-                            </select>
-                        </div>
-                        <div class="input-group mb-3">
-                            <button class="btn btn-primary" type="button" data-toggle="collapse"
-                                    data-target="#collapseExample"
-                                    aria-expanded="false" aria-controls="collapseExample">
-                                新建分类
-                            </button>
-                            <div class="collapse" id="collapseExample">
-                                <div class="card card-body">
-                                    <div class="form-group">
-                                        <label for="new-clazz-title">名称</label>
-                                        <input type="text" id="new-clazz-title" class="form-control"
-                                               v-model="newClazz.title">
+        <!-- Modal -->
+        <div class="modal fade" id="staticBackdrop" data-backdrop="static" tabindex="-1" role="dialog"
+            aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">保存笔记</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div>
+                            <div class="form-group">
+                                <label for="clazz-select">分类：</label>
+                                <select id="clazz-select" class="custom-select" v-model="note.clazzId">
+                                    <option :value="null" selected>默认分类</option>
+                                    <option v-for="clazz,index in clazzList" :value="clazz.id">{{clazz.title}}
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="input-group mb-3">
+                                <button class="btn btn-primary" type="button" data-toggle="collapse"
+                                    data-target="#collapseExample" aria-expanded="false"
+                                    aria-controls="collapseExample">
+                                    新建分类
+                                </button>
+                                <div class="collapse" id="collapseExample">
+                                    <div class="card card-body">
+                                        <div class="form-group">
+                                            <label for="new-clazz-title">名称</label>
+                                            <input type="text" id="new-clazz-title" class="form-control"
+                                                v-model="newClazz.title">
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="new-clazz-detail">描述</label>
+                                            <textarea type="text" id="new-clazz-detail" class="form-control"
+                                                v-model="newClazz.detail"></textarea>
+                                        </div>
+                                        <button class="btn btn-primary" @click="insertNewClazz">保存分类</button>
                                     </div>
-                                    <div class="form-group">
-                                        <label for="new-clazz-detail">描述</label>
-                                        <textarea type="text" id="new-clazz-detail"
-                                                  class="form-control" v-model="newClazz.detail"></textarea>
-                                    </div>
-                                    <button class="btn btn-primary" @click="insertNewClazz" >保存分类</button>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-                    <button type="button" class="btn btn-primary"
-                            @click="saveRemote">确定
-                    </button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+                        <button type="button" class="btn btn-primary" @click="saveRemote">确定
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 </body>
 <script src="js/vue.js"></script>
 <script src="js/marked.min.js"></script>
@@ -107,9 +102,9 @@
 
 <script src="js/jquery-3.4.1.min.js" crossorigin="anonymous"></script>
 <script src="js/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
+    crossorigin="anonymous"></script>
 <script src="js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-        crossorigin="anonymous"></script>
+    crossorigin="anonymous"></script>
 <script src="js/bootoast.js"></script>
 
 
@@ -183,10 +178,10 @@
                 var fun = remoteJs.insertNote;
                 // 获取笔记的摘要
                 var t = me.translate;
-                var profile = t.replace(/<\/.*?>/g,'');
-                profile = profile.replace(/<.*?>/g,'');
-                profile = profile.replace(/\s+/g,' ');
-                if(profile.length > 150)// 控制摘要的长度
+                var profile = t.replace(/<\/.*?>/g, '');
+                profile = profile.replace(/<.*?>/g, '');
+                profile = profile.replace(/\s+/g, ' ');
+                if (profile.length > 150)// 控制摘要的长度
                     profile = profile.slice(0, 150) + '...';
                 console.log(profile);
                 me.note.profile = profile;
@@ -270,5 +265,12 @@
         background-color: #0b2e13;
         color: white;
     }
+
+    /* 显示 笔记的面板 */
+    /* 防止过大的图片 溢出边界 */
+    .note-panel img {
+        max-width: 100%;
+    }
 </style>
+
 </html>
